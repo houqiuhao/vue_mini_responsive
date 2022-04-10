@@ -51,12 +51,12 @@ class Observer {
             })
         }
     }
-    defineReactive(data,key,value) {
+    defineReactive(obj,key,value) {
         // 递归遍历，对象属性也有可能是对象
         this.observer(value);
         // 观察数据时候需要创建dep ，也就是依赖
         const dep = new Dep()
-        Object.defineProperty(data,key, {
+        Object.defineProperty(obj,key, {
             enumerable:true,
             configurable:false,
             get() {

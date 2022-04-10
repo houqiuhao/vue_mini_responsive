@@ -4,6 +4,11 @@ const compileUtil = {
             return data[currentVal];
         }, vm.$data);
     },
+    setValue(expr,vm,inputVal) {
+        return expr.split('.').reduce((data, currentVal) => {
+            data[currentVal] = inputVal;
+        }, vm.$data);
+    },
     text(node, expr, vm) { //expr: msg
         let value;
         if(expr.indexOf('{{') !== -1) {
@@ -25,10 +30,15 @@ const compileUtil = {
     },
     model(node, expr, vm) {
         const value = this.getValue(expr,vm)//vm.$data[expr];
+        // 绑定更新函数  数据 =》 视图
         new Watcher(vm, expr, (newVal) => {
             this.updater.modelUpdater(node, newVal)
         })
         this.updater.modelUpdater(node,value)
+        // 视图驱动数据 
+        node.addEventListener('input',(e) => {
+            this.setValue(expr,vm,e.target.value)
+        })
     },
     on(node, expr, vm,eventName) {
         let fn = vm.$options.methods && vm.$options.methods[expr];
@@ -41,10 +51,10 @@ const compileUtil = {
             node.textContent = value;
         },
         htmlUpdater(node, value) {
-            node.textContent = value;
+            node.innerHTML = value;
         },
         modelUpdater(node, value) {
-            node.textContent = value;
+            node.value = value;
         }
     }
 }
